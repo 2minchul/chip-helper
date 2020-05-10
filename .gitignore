@@ -3,6 +3,21 @@ tmp/
 # Created by https://www.gitignore.io/api/venv,macos,python,images,pycharm,windows,virtualenv,pycharm+iml,pycharm+all
 # Edit at https://www.gitignore.io/?templates=venv,macos,python,images,pycharm,windows,virtualenv,pycharm+iml,pycharm+all
 
+### Video ###
+*.3g2
+*.3gp
+*.asf
+*.asx
+*.avi
+*.flv
+*.mov
+*.mp4
+*.mpg
+*.rm
+*.swf
+*.vob
+*.wmv
+
 ### Images ###
 # JPEG
 *.jpg
