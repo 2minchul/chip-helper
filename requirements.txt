@@ -1,0 +1,5 @@
+Pillow==7.1.2
+PyQRCode==1.2.1
+pypng==0.0.20
+requests==2.23.0
+selenium==3.141.0
