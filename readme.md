@@ -21,7 +21,17 @@
 ## How to use
 
 ### 폴더 생성기
+특정 경로에 x번 부터 y번 까지 nnnn 형식의 폴더를 생성합니다.  
+상대경로와 절대경로 모두 지원합니다.
+
 1. `폴더생성기.cmd` 실행
+
+Example Input.
+```text
+생성할 경로: input
+시작할 숫자: 1
+끝나는 숫자: 1000
+```
 
 ### 썸네일 생성기
 1. [input](https://github.com/2minchul/chip-helper/tree/master/input) 폴더 안에 썸네일로 쓰일 사진을 설명대로 위치시키세요.
