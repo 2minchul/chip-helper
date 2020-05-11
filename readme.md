@@ -34,3 +34,4 @@ Example Input.
 ### 썸네일 생성기
 1. [input](https://github.com/2minchul/chip-helper/tree/master/input) 폴더 안에 썸네일로 쓰일 사진을 설명대로 위치시키세요.
 2. `썸네일생성기.cmd` 실행
+3. 각 폴더 안에 p`nnnn`.jpg 가 생성됩니다.
