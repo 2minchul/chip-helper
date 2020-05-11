@@ -1,9 +1,9 @@
 import os
 
-from cmd_tool import exit_enter
+from cmd_tool import exit_enter,get_execution_path
 
 if __name__ == '__main__':
-
+    os.chdir(get_execution_path())
     print(os.path.abspath(os.curdir))
     print('폴더 생성기')
     print('존재하는 폴더는 건너뜀')
