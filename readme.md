@@ -1,7 +1,5 @@
 # chip-helper
 
-*비개발자를 위한 상세한 설명입니다*
-
 - [Install](#Install)
 - [How to use](#how-to-use)
 
