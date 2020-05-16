@@ -71,7 +71,7 @@ def upload_videos():
         print('최상위 폴더에 cookies.txt 를 작성해야 합니다')
         exit_enter(1)
 
-    uploader = my_channel_id = None
+    uploader = None
     video_dirs = {}
 
     for cur_dir, _, files in os.walk(input_path):
