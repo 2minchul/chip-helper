@@ -49,8 +49,9 @@ def make_thumbnail():
                 continue
 
             n = int(dir_name)
-            print('composite:', jpg_filename, '...')
-            composite_thumbnail(os.path.join(cur_dir, jpg_filename), os.path.join(cur_dir, f'p{n:04}.jpg'))
+            target_filename = f'p{n:04}.jpg'
+            print('composite:', jpg_filename, 'to', target_filename, '...')
+            composite_thumbnail(os.path.join(cur_dir, jpg_filename), os.path.join(cur_dir, target_filename))
 
     print('완료되었습니다!')
     exit_enter()
@@ -160,16 +161,13 @@ if __name__ == '__main__':
     subparsers.add_parser('makedirs', help='Create dirs like "nnnn" format in a specific path')
     subparsers.add_parser('thumbnail', help='Create thumbnails')
     subparsers.add_parser('upload', help='Upload videos to youtube')
-    subparsers.add_parser('update-youtube-urls', help='Make youtube_url.txt in input dirs')
+    subparsers.add_parser('youtube-url', help='Make youtube_url.txt in input dirs')
 
     args = parser.parse_args()
     func = {
         'makedirs': make_dirs,
         'thumbnail': make_thumbnail,
         'upload': upload_videos,
-        'update-youtube-urls': update_youtube_urls,
+        'youtube-url': update_youtube_urls,
     }.get(args.command)
     func()
-
-# if __name__ == '__main__':
-#     update_youtube_urls('UCU9LS8hjdbvrXdD7myEIz3A')
