@@ -83,7 +83,11 @@ def upload_videos():
 
     for cur_dir, _, files in os.walk(input_path):
         dir_name = os.path.basename(cur_dir)
-        video_path = thumbnail_path = None
+        video_path = video_name = thumbnail_path = None
+
+        if 1 < len(tuple(filter(lambda s: s.endswith('.mp4'), files))):
+            print(f'"{cur_dir}" 에 여러개의 .mp4 파일이 존재합니다!')
+            continue
 
         for filename in files:
             if filename == 'youtube_url.txt':
@@ -91,19 +95,23 @@ def upload_videos():
                 print(f'already uploaded: {dir_name}')
                 break
 
-            name, ext = os.path.splitext(filename)
+            current_video_name, ext = os.path.splitext(filename)
             if ext == '.mp4':
-                video_path = os.path.join(cur_dir, filename)
-                video_dirs[name] = cur_dir
+                if not dir_name.isnumeric():
+                    print(f'skip: "{dir_name}" 는 숫자로 구성된 폴더이름이 아닙니다')
+                    break
+
+                video_name = f'{int(dir_name):04}'
+                video_path = os.path.join(cur_dir, f'{video_name}.mp4')
+                if current_video_name != video_name:
+                    print(f'rename "{filename}" to "{video_name}.mp4"')
+                    os.rename(os.path.join(cur_dir, filename), video_path)
+                video_dirs[video_name] = cur_dir
 
             elif ext == '.jpg' and re.match(r'p\d+[.]jpg', filename):
                 thumbnail_path = os.path.join(cur_dir, filename)
 
         if not (video_path and thumbnail_path):
-            continue
-
-        if not dir_name.isnumeric():
-            print(f'skip: "{dir_name}" 는 숫자로 구성된 폴더이름이 아닙니다')
             continue
 
         if not uploader:
@@ -112,6 +120,7 @@ def upload_videos():
             with open(os.path.join(path, '.mychannelid'), 'w') as f:
                 f.write(my_channel_id)
 
+        print(f'uploading {video_name}')
         uploader.upload_video(video_path, thumbnail_path)
 
     print('모든 동영상이 업로드 되었습니다.')
