@@ -1,3 +1,3 @@
 @echo off
 pushd %~dp0
-src\python make_thumbnail.py
+src\python command.py thumbnail
