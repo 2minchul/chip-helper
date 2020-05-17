@@ -4,6 +4,7 @@ import re
 import sys
 from typing import Optional
 
+import sentry_sdk
 import youtube_dl
 
 from cmd_tool import (
@@ -18,6 +19,8 @@ from imagetools import get_image_size, Size
 from qrcode import NaverQrCode, make_qr_image, make_redirect_html
 from thumbnail import composite_thumbnail
 from youtube_uploader import YoutubeUploader
+
+sentry_sdk.init("https://1ff694f9169a4fa383a867fe10ed9329@o342398.ingest.sentry.io/5243685")
 
 
 def make_dirs():

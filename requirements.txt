@@ -7,3 +7,4 @@ svgwrite==1.4
 youtube_dl
 reportlab==3.5.42
 svglib==1.0.0
+sentry-sdk==0.14.4
