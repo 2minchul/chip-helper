@@ -160,12 +160,17 @@ def update_youtube_urls(my_channel_id=None):
         f'https://www.youtube.com/channel/{my_channel_id}', download=False, process=False
     ).get('url')
 
+    is_created = False
     for video in yt.extract_info(my_channel_playlist, download=False, process=False).get('entries'):
         title = video['title']
         if video_dirs.get(title):
+            is_created = True
             print(f'make youtube_url.txt: {title}')
             with open(os.path.join(video_dirs[title], 'youtube_url.txt'), 'w') as f:
                 f.write(f"https://www.youtube.com/watch?v={video['id']}")
+    if not is_created:
+        print('업로드 된 동영상이 없거나, 아직 업로드가 완전히 완료되지 않았습니다.')
+        print('잠시 후 다시 시도해주세요.')
     exit_enter()
 
 
@@ -183,10 +188,14 @@ def qrcode():
 
     for cur_dir, _, files in os.walk(input_path):
         dir_name = os.path.basename(cur_dir)
-        if 'youtube_url.txt' not in files:
-            continue
         if not dir_name.isnumeric():
             continue
+        if 'youtube_url.txt' not in files:
+            continue
+        if 'qrcode.html' in files:
+            print(f'already created: {dir_name}')
+            continue
+
         idx = int(dir_name)
         idx_text = f'{idx:04}'
         with open(os.path.join(cur_dir, 'youtube_url.txt'), 'r') as f:
