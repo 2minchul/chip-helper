@@ -1,6 +1,7 @@
 import argparse
 import os
 import re
+import sys
 from typing import Optional
 
 import youtube_dl
@@ -34,7 +35,7 @@ def make_dirs():
     for i in range(s, e + 1):
         os.makedirs(os.path.join(path, f'{i:04}'), exist_ok=True)
     print('완료')
-    exit_enter(0)
+    exit_enter()
 
 
 def make_thumbnail():
@@ -114,6 +115,7 @@ def upload_videos():
         uploader.upload_video(video_path, thumbnail_path)
 
     print('모든 동영상이 업로드 되었습니다.')
+    exit_enter()
 
 
 def update_youtube_urls(my_channel_id=None):
@@ -155,6 +157,7 @@ def update_youtube_urls(my_channel_id=None):
             print(f'make youtube_url.txt: {title}')
             with open(os.path.join(video_dirs[title], 'youtube_url.txt'), 'w') as f:
                 f.write(f"https://www.youtube.com/watch?v={video['id']}")
+    exit_enter()
 
 
 def qrcode():
@@ -209,8 +212,10 @@ def qrcode():
         naver_qr.visit_admin_page()
 
     print('모든 작업이 끝났습니다.')
-    input()
-    naver_qr.close()
+    input('press enter to exit...')
+    if naver_qr:
+        naver_qr.close()
+    sys.exit(0)
 
 
 if __name__ == '__main__':
@@ -232,3 +237,5 @@ if __name__ == '__main__':
         'qrcode': qrcode,
     }.get(args.command)
     func()
+    print('모든 작업이 완료되었습니다.')
+    exit_enter()
