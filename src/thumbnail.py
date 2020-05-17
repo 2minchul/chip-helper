@@ -1,20 +1,7 @@
-from typing import NamedTuple
-
 from PIL import Image, ImageFilter
 from PIL.PngImagePlugin import PngImageFile
 
-
-class Size(NamedTuple):
-    width: int
-    height: int
-
-    @classmethod
-    def from_tuple(cls, size):
-        return cls(*size)
-
-    @classmethod
-    def from_img(cls, img):
-        return cls(*img.size)
+from imagetools import Size
 
 
 def zoom(img, percent):
@@ -44,20 +31,14 @@ def paste_center(img, small_img):
 
 def composite_thumbnail(input_path, output_path):
     canvas_size = Size(1920, 1440)
-    # print('canvas', canvas_size)
 
     origin_img: PngImageFile = Image.open(input_path)
-    # print('origin', Size.from_img(origin_img))
 
     zoom_img = zoom(origin_img, 118.98)
     zoom_size = Size.from_img(zoom_img)
-    # print('zoom', zoom_size)
-    # zoom_img.save('zoom.jpg')
 
     # crop center
     crop_img = crop_center(zoom_img, Size(canvas_size.width, zoom_size.height))
-    # print('crop', Size.from_tuple(crop_img.size))
-    # im.save('tmp.jpg', format='JPEG', quality=100)
 
     bg_img = zoom(
         crop_img,

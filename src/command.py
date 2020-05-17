@@ -1,11 +1,21 @@
 import argparse
 import os
 import re
+from typing import Optional
 
 import youtube_dl
 
-from cmd_tool import get_execution_path, exit_enter, get_input_path_or_exit
-from imagetools import get_image_size, composite_thumbnail
+from cmd_tool import (
+    get_execution_path,
+    exit_enter,
+    get_input_path_or_exit,
+    get_chrome_driver_path_or_exit,
+    get_resource_path,
+    cd
+)
+from imagetools import get_image_size, Size
+from qrcode import NaverQrCode, make_qr_image, make_redirect_html
+from thumbnail import composite_thumbnail
 from youtube_uploader import YoutubeUploader
 
 
@@ -59,14 +69,10 @@ def make_thumbnail():
 
 def upload_videos():
     path = get_execution_path()
-    chrome_driver_path = os.path.join(path, 'chromedriver.exe')
+    chrome_driver_path = get_chrome_driver_path_or_exit()
     input_path = get_input_path_or_exit()
+
     cookie_path = os.path.join(get_execution_path(), 'cookies.txt')
-
-    if not os.path.isfile(chrome_driver_path):
-        print('최상위 폴더에 chromedriver 를 다운받아야 합니다')
-        exit_enter(1)
-
     if not os.path.isfile(cookie_path):
         print('최상위 폴더에 cookies.txt 를 작성해야 합니다')
         exit_enter(1)
@@ -125,10 +131,7 @@ def update_youtube_urls(my_channel_id=None):
             exit_enter(1)
 
     yn = input('기존에 존재하는 youtube_url.txt 도 덮어쓰시겠습니까? [y/n]: ')
-    if yn == 'y':
-        overwrite = True
-    else:
-        overwrite = False
+    overwrite = yn == 'y'
 
     video_dirs = {}
     for cur_dir, _, files in os.walk(input_path):
@@ -154,6 +157,62 @@ def update_youtube_urls(my_channel_id=None):
                 f.write(f"https://www.youtube.com/watch?v={video['id']}")
 
 
+def qrcode():
+    input_path = get_input_path_or_exit()
+    chrome_driver_path = get_chrome_driver_path_or_exit()
+    resource_path = get_resource_path()
+
+    if not os.path.isfile(os.path.join(resource_path, 'DXGulimB-KSCpc-EUC-H.ttf')):
+        print('폰트 파일을 찾을 수 없습니다.')
+        print('DXGulimB-KSCpc-EUC-H.ttf 파일을 "font/" 안에 넣어주세요!')
+        exit_enter(1)
+
+    naver_qr: Optional[NaverQrCode] = None
+
+    for cur_dir, _, files in os.walk(input_path):
+        dir_name = os.path.basename(cur_dir)
+        if 'youtube_url.txt' not in files:
+            continue
+        if not dir_name.isnumeric():
+            continue
+        idx = int(dir_name)
+        idx_text = f'{idx:04}'
+        with open(os.path.join(cur_dir, 'youtube_url.txt'), 'r') as f:
+            youtube_url = f.read()
+
+        if not naver_qr:
+            naver_qr = NaverQrCode()
+            naver_qr.init(chrome_driver_path)
+            print('waiting login ...')
+            naver_qr.login()
+            print('login success')
+
+        qr_data = naver_qr.create_qr(idx_text, youtube_url).get('QRCodeData', {})
+        qr_url = qr_data.get('qrCodeUrl')
+        qr_id = qr_data.get('qrcdNo')
+
+        if not qr_url:
+            print(f'{idx_text}: QR CODE 생성에 실패했습니다')
+            continue
+
+        with cd(resource_path):
+            print(f'creating "{idx_text}.png"')
+            image = make_qr_image(Size(591, 738), qr_url, idx)  # 5cm x 6.25cm (300dpi)
+            with open(os.path.join(cur_dir, f'{idx_text}.png'), 'wb') as f:
+                image.save(f, format='PNG', dpi=(300, 300))
+            make_redirect_html(
+                os.path.join(cur_dir, 'qrcode.html'),
+                f'https://qr.naver.com/code/updateForm.nhn?qrcdNo={qr_id}'
+            )
+
+    if naver_qr:
+        naver_qr.visit_admin_page()
+
+    print('모든 작업이 끝났습니다.')
+    input()
+    naver_qr.close()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Chip Helper')
     subparsers = parser.add_subparsers(help='commands', dest='command', required=True)
@@ -162,6 +221,7 @@ if __name__ == '__main__':
     subparsers.add_parser('thumbnail', help='Create thumbnails')
     subparsers.add_parser('upload', help='Upload videos to youtube')
     subparsers.add_parser('youtube-url', help='Make youtube_url.txt in input dirs')
+    subparsers.add_parser('qrcode', help='Generate Naver QR and composite qr image')
 
     args = parser.parse_args()
     func = {
@@ -169,5 +229,6 @@ if __name__ == '__main__':
         'thumbnail': make_thumbnail,
         'upload': upload_videos,
         'youtube-url': update_youtube_urls,
+        'qrcode': qrcode,
     }.get(args.command)
     func()
