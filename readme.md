@@ -15,6 +15,12 @@
 3. 실행환경 구성
     - `setup.cmd` 를 실행합니다.
     - 실행 후 `venv` 폴더가 생성되고 `finish!` 문구가 보이면 정상입니다.
+4. 추가적인 파일
+    - `DXGulimB-KSCpc-EUC-H.ttf` 를 `resource` 폴더 안에 넣어주세요
+    - `chromedriver.exe` 를 아래 설명대로 다운받아 `resource` 폴더 안에 넣어주세요
+        1. 사용중인 크롬에서 *설정* - *Chrome 정보* 에서 크롬 버전을 확인합니다.
+        2. https://chromedriver.chromium.org/downloads 에서 사용중인 크롬 정보와 가장 비슷한 버전을 선택합니다.
+        3. `chromedriver_win32.zip` 를 다운받은 후 압축을 풀어주세요.
 
 ## How to use
 
