@@ -15,9 +15,9 @@ from cmd_tool import (
     get_resource_path,
     cd
 )
-from imagetools import get_image_size, Size
+from imagetools import Size
 from qrcode import NaverQrCode, make_qr_image, make_redirect_html
-from thumbnail import composite_thumbnail
+from thumbnail import composite_thumbnail, capture_video
 from youtube_uploader import YoutubeUploader
 
 sentry_sdk.init("https://1ff694f9169a4fa383a867fe10ed9329@o342398.ingest.sentry.io/5243685")
@@ -46,26 +46,30 @@ def make_thumbnail():
 
     for cur_dir, _, files in os.walk(input_path):
         dir_name = os.path.basename(cur_dir)
-        jpg_filename = None
 
-        # set filenames
-        for file_name in files:
-            _, ext = os.path.splitext(file_name)
-            if ext == '.jpg':
-                jpg_path = os.path.join(cur_dir, file_name)
-                if get_image_size(jpg_path) == (1920, 1080):
-                    jpg_filename = file_name
-                    break
+        def _is_mp4(filename):
+            _, ext = os.path.splitext(filename)
+            return ext == '.mp4'
 
-        if jpg_filename:
-            if not dir_name.isnumeric():
-                print(f'skip: "{dir_name}" 는 숫자로 구성된 폴더이름이 아닙니다')
-                continue
+        mp4_files = tuple(filter(_is_mp4, files))
 
-            n = int(dir_name)
-            target_filename = f'p{n:04}.jpg'
-            print('composite:', jpg_filename, 'to', target_filename, '...')
-            composite_thumbnail(os.path.join(cur_dir, jpg_filename), os.path.join(cur_dir, target_filename))
+        if 1 < len(mp4_files):
+            print(f'pass: "{dir_name}" 안에 한개 이상의 mp4 파일이 존재합니다')
+
+        if not dir_name.isnumeric():
+            print(f'skip: "{dir_name}" 는 숫자로 구성된 폴더이름이 아닙니다')
+            continue
+
+        idx_text = f'{int(dir_name):04}'
+        mp4_filename = mp4_files[0]
+        jpg_filename = f'{idx_text}.jpg'
+        jpg_filepath = os.path.join(cur_dir, jpg_filename)
+
+        print(f'capture:\t{mp4_filename} to {jpg_filename}')
+        capture_video(os.path.join(cur_dir, mp4_filename), jpg_filepath)
+        target_filename = f'p{idx_text}.jpg'
+        print(f'composite:\t{jpg_filename} to {target_filename} ...')
+        composite_thumbnail(jpg_filepath, os.path.join(cur_dir, target_filename))
 
     print('완료되었습니다!')
     exit_enter()
