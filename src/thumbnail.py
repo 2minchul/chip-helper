@@ -1,3 +1,4 @@
+import cv2
 from PIL import Image, ImageFilter
 from PIL.PngImagePlugin import PngImageFile
 
@@ -49,3 +50,9 @@ def composite_thumbnail(input_path, output_path):
 
     paste_center(bg_img, crop_img)
     bg_img.save(output_path, format='JPEG', quality=100, dpi=(300, 300))
+
+
+def capture_video(video_path, output_path):
+    vcap = cv2.VideoCapture(video_path)
+    res, im_ar = vcap.read()
+    cv2.imwrite(output_path, im_ar)

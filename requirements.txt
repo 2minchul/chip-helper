@@ -8,3 +8,4 @@ youtube_dl
 reportlab==3.5.42
 svglib==1.0.0
 sentry-sdk==0.14.4
+opencv-python==4.2.0.34
