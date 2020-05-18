@@ -243,11 +243,32 @@ def qrcode():
     sys.exit(0)
 
 
+def organize():
+    input_path = get_input_path_or_exit()
+    for filename in os.listdir(input_path):
+        filepath = os.path.join(input_path, filename)
+        if not os.path.isfile(filepath) or 'README.txt' == filename:
+            continue
+
+        name, _ = os.path.splitext(filename)
+        if not name.isnumeric():
+            print(f'pass: "{filename}" 은 숫자로 이루어진 이름이 아닙니다')
+            continue
+        dir_path = os.path.join(input_path, f'{int(name)}')
+        os.makedirs(dir_path, exist_ok=True)
+        try:
+            os.rename(filepath, os.path.join(dir_path, filename))
+            print(f'move "{filename}" to "{int(name)}/{filename}"')
+        except Exception as e:
+            print(f'"{filename}" 을 옮기는데 실패하였습니다: {e}')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Chip Helper')
     subparsers = parser.add_subparsers(help='commands', dest='command', required=True)
 
     subparsers.add_parser('makedirs', help='Create dirs like "nnnn" format in a specific path')
+    subparsers.add_parser('organize', help='Create numeric dirs and move video files in it')
     subparsers.add_parser('thumbnail', help='Create thumbnails')
     subparsers.add_parser('upload', help='Upload videos to youtube')
     subparsers.add_parser('youtube-url', help='Make youtube_url.txt in input dirs')
@@ -260,6 +281,7 @@ if __name__ == '__main__':
         'upload': upload_videos,
         'youtube-url': update_youtube_urls,
         'qrcode': qrcode,
+        'organize': organize,
     }.get(args.command)
     func()
     print('모든 작업이 완료되었습니다.')
