@@ -24,42 +24,42 @@
 
 ## How to use
 
-### 1-폴더 생성기
-특정 경로에 x번 부터 y번 까지 *nnnn* 형식의 폴더를 생성합니다.  
-상대경로와 절대경로 모두 지원합니다.
+### 1-영상분류
 
-1. `1-폴더생성기.cmd` 실행
+영상 파일의 이름을 기준으로 숫자로 이루어진 하위 폴더를 생성 한 후 영상 파일을 이동시킵니다.
 
-Example Input.
-```text
-생성할 경로: input
-시작할 숫자: 1
-끝나는 숫자: 1000
-```
+1. [input](https://github.com/2minchul/chip-helper/tree/master/input) 폴더 안에 숫자로 이루어진 이름의 1920 x 1080 영상파일들을 넣어주세요.
+2. `1-영상분류.cmd` 실행
 
 ### 2-썸네일 생성기
 
-1. [input](https://github.com/2minchul/chip-helper/tree/master/input) 폴더 하위의 숫자폴더 안에 썸네일로 쓰일 1920 x 1080 사이즈의 .jpg 파일을 위치시키세요.
-2. `2-썸네일생성기.cmd` 실행
-3. 각 폴더 안에 p`nnnn`.jpg 가 생성됩니다.
+영상 파일에서 자동으로 이미지를 캡처 한 후에 이미지를 합성하여 후면 전사 사진을 만듭니다.
+
+1. `2-썸네일생성기.cmd` 실행
+2. 각 폴더 안에 p`nnnn`.jpg 가 생성됩니다.
 
 ### 3-유튜브업로드
 
-1. [input](https://github.com/2minchul/chip-helper/tree/master/input) 폴더 하위의 숫자폴더 안에 .mp4 파일을 위치시키세요.
-2. 크롬을 켜서 [cookiestxt](https://chrome.google.com/webstore/detail/cookiestxt/njabckikapfpffapmjgojcnbfjonfjfg) 플러그인을 설치하세요.
-3. 유튜브에 접속 후 로그인 합니다.
-4. 유튜브 창에서 cookiestxt 플러그인을 클릭하여 보이는 모든 text 를 복사 합니다.
-5. 프로젝트 최상위 폴더 안에 `cookies.txt` 파일 생성 후 복사한 text 를 붙여넣습니다. (해당 text는 로그인 정보를 포함하고 있으므로 다른이에게 공유하면 안됩니다)
-6. `3-유튜브업로드.cmd` 실행
-7. 영상 파일은 *nnnn*.mp4 형식으로 이름이 변경되며 순차적으로 유튜브에 업로드됩니다.
+**썸네일 생성기** 에서 만들어진 썸네일과 영상파일들을 일괄적으로 유튜브에 업로드 합니다.
+
+1. 크롬을 켜서 [cookiestxt](https://chrome.google.com/webstore/detail/cookiestxt/njabckikapfpffapmjgojcnbfjonfjfg) 플러그인을 설치하세요.
+2. 유튜브에 접속 후 로그인 합니다.
+3. 유튜브 창에서 cookiestxt 플러그인을 클릭하여 보이는 모든 text 를 복사 합니다.
+4. 프로젝트 최상위 폴더 안에 `cookies.txt` 파일 생성 후 복사한 text 를 붙여넣습니다. (해당 text는 로그인 정보를 포함하고 있으므로 다른이에게 공유하면 안됩니다)
+5. `3-유튜브업로드.cmd` 실행
+6. 영상 파일은 *nnnn*.mp4 형식으로 이름이 변경되며 순차적으로 유튜브에 업로드됩니다.
 
 ### 4-유튜브url추출
+
+유튜브에 업로드 된 영상의 url 을 가져와서 `youtube_url.txt` 를 생성합니다.
 
 1. **3-유튜브업로드** 에서 업로드한 영상이 모두 정상적으로 게시될때까지 기다립니다.
 2. `4-유튜브url추출.cmd` 실행
 3. 각 폴더 하위에 해당 영상의 url 이 저장된 `youtube_url.txt` 가 생성됩니다.
 
 ### 5-qr코드생성기
+
+유튜브 url을 네이버 QR코드 서비스에 등록 한 후 QR코드 이미지를 합성합니다.
 
 1. 각 폴더에 **4-유튜브url추출** 에서 만들어진 `youtube_url.txt` 가 정상적으로 존재하는지 확인하세요.
 2. `5-qr코드생성기.cmd` 실행
