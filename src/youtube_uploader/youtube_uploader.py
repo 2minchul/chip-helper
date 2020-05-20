@@ -8,7 +8,7 @@ from selenium.common.exceptions import UnableToSetCookieException, ElementClickI
 
 from selenium_helper import wait_element_by_name, wait_element_by_id
 from .exceptions import BadStatusError
-
+import time
 
 class YoutubeUploader:
     browser: Optional[webdriver.Chrome] = None
@@ -61,7 +61,7 @@ class YoutubeUploader:
 
         upload_btn = None
         for _ in range(3):
-            browser.get('https://studio.youtube.com/')
+            browser.get(f'https://studio.youtube.com?_={str(int(time.time()))}')
             try:
                 upload_btn = wait_element_by_id(browser, 'upload-button', max_count=3)
                 if not upload_btn:
@@ -114,13 +114,13 @@ class YoutubeUploader:
 
         is_finish = False
         while not is_finish:
-            for element in self.browser.find_elements_by_class_name('ytcp-button'):
-                if element.text == '닫기':
+            for element in self.browser.find_elements_by_id('dialog-title'):
+                if element.text == '동영상 처리 중':
                     is_finish = True
                     break
             self.check_status(sleep=1)
 
-        browser.implicitly_wait(2)
+        time.sleep(2)
         return True
 
     def check_status(self, sleep=0.0):

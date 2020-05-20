@@ -1,4 +1,6 @@
-from selenium.common.exceptions import NoSuchElementException
+import time
+
+from selenium.common.exceptions import NoSuchElementException, UnexpectedAlertPresentException
 from selenium.webdriver.common.by import By
 
 
@@ -6,6 +8,11 @@ def is_element_exists_by(br, element_name, by):
     try:
         br.find_element(by, element_name)
     except NoSuchElementException:
+        return False
+    except UnexpectedAlertPresentException:
+        alert = br.switch_to.alert
+        alert.accept()
+        time.sleep(2)
         return False
     return True
 
