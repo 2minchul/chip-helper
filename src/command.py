@@ -127,17 +127,17 @@ def upload_videos():
         to_upload[int(dir_name)] = (video_name, video_path, thumbnail_path)
 
     for dir_number, (video_name, video_path, thumbnail_path) in sorted(to_upload.items(), key=lambda e: e[0]):
-        if not uploader:
-            uploader = YoutubeUploader()
-            try:
-                my_channel_id = uploader.init(chrome_driver_path, cookie_path)
-            except SessionNotCreatedException as e:
-                print(e)
-                print('컴퓨터에 설치된 chrome 과 chromedriver 의 버전이 일치하지 않습니다.')
-                print('https://chromedriver.chromium.org/downloads 에서 다시 chromedriver 를 다운로드 해주세요.')
-                break
-            with open(os.path.join(path, '.mychannelid'), 'w') as f:
-                f.write(my_channel_id)
+        # if not uploader:
+        uploader = YoutubeUploader()
+        try:
+            my_channel_id = uploader.init(chrome_driver_path, cookie_path)
+        except SessionNotCreatedException as e:
+            print(e)
+            print('컴퓨터에 설치된 chrome 과 chromedriver 의 버전이 일치하지 않습니다.')
+            print('https://chromedriver.chromium.org/downloads 에서 다시 chromedriver 를 다운로드 해주세요.')
+            break
+        with open(os.path.join(path, '.mychannelid'), 'w') as f:
+            f.write(my_channel_id)
 
         print(f'uploading {video_name}')
         try:
@@ -148,6 +148,10 @@ def upload_videos():
         except YoutubeUploaderException as e:
             print(e)
             print(f'failure: {video_name}')
+        try:
+            uploader.browser.close()
+        except:
+            pass
 
     print('모든 업로드 작업을 마쳤습니다.')
     exit_enter()
