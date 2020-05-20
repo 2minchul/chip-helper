@@ -4,7 +4,8 @@ from http import cookiejar
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import UnableToSetCookieException, ElementClickInterceptedException
+from selenium.common.exceptions import UnableToSetCookieException, ElementClickInterceptedException, \
+    StaleElementReferenceException
 
 from selenium_helper import wait_element_by_name, wait_element_by_id
 from .exceptions import BadStatusError
@@ -115,7 +116,12 @@ class YoutubeUploader:
         is_finish = False
         while not is_finish:
             for element in self.browser.find_elements_by_id('dialog-title'):
-                if element.text == '동영상 처리 중':
+                try:
+                    if element.text == '동영상 처리 중':
+                        is_finish = True
+                        break
+                except StaleElementReferenceException:
+                    time.sleep(1)
                     is_finish = True
                     break
             self.check_status(sleep=1)
