@@ -6,6 +6,7 @@ from typing import Optional
 
 import sentry_sdk
 import youtube_dl
+from selenium.common.exceptions import SessionNotCreatedException
 
 from cmd_tool import (
     get_execution_path,
@@ -123,7 +124,13 @@ def upload_videos():
 
         if not uploader:
             uploader = YoutubeUploader()
-            my_channel_id = uploader.init(chrome_driver_path, cookie_path)
+            try:
+                my_channel_id = uploader.init(chrome_driver_path, cookie_path)
+            except SessionNotCreatedException as e:
+                print(e)
+                print('컴퓨터에 설치된 chrome 과 chromedriver 의 버전이 일치하지 않습니다.')
+                print('https://chromedriver.chromium.org/downloads 에서 다시 chromedriver 를 다운로드 해주세요.')
+                break
             with open(os.path.join(path, '.mychannelid'), 'w') as f:
                 f.write(my_channel_id)
 
@@ -137,7 +144,7 @@ def upload_videos():
             print(e)
             print(f'failure: {video_name}')
 
-    print('모든 동영상이 업로드를 마쳤습니다.')
+    print('모든 업로드 작업을 마쳤습니다.')
     exit_enter()
 
 
