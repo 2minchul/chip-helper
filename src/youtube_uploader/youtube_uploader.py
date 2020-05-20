@@ -4,11 +4,10 @@ from http import cookiejar
 from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import UnableToSetCookieException, NoSuchElementException, \
-    ElementClickInterceptedException, ElementNotInteractableException
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import UnableToSetCookieException, ElementClickInterceptedException
 
-from selenium_helper import wait_element_by_name, wait_element_by_id, wait_element_by_xpath, is_element_exists_by
+from selenium_helper import wait_element_by_name, wait_element_by_id
+from .exceptions import BadStatusError
 
 
 class YoutubeUploader:
@@ -59,13 +58,26 @@ class YoutubeUploader:
 
     def upload_video(self, video_path, thumbnail_path):
         browser = self.browser
-        browser.get('https://studio.youtube.com/')
 
-        upload_btn = wait_element_by_id(browser, 'upload-button')
-        upload_btn.click()
+        upload_btn = None
+        for _ in range(3):
+            browser.get('https://studio.youtube.com/')
+
+            upload_btn = wait_element_by_id(browser, 'upload-button', max_count=3)
+            if not upload_btn:
+                upload_btn = wait_element_by_id(browser, 'upload-icon', max_count=3)
+            if upload_btn:
+                upload_btn.click()
+                break
+        if not upload_btn:
+            return False
+
+        self.check_status(sleep=1)
 
         select_input = wait_element_by_name(browser, 'Filedata')
         select_input.send_keys(video_path)
+
+        self.check_status(sleep=0.5)
 
         th = wait_element_by_id(browser, 'file-loader')
         th.send_keys(thumbnail_path)
@@ -76,7 +88,8 @@ class YoutubeUploader:
         next_btn = wait_element_by_id(browser, 'next-button')
         next_btn.click()
 
-        wait_element_by_xpath(browser, '//a[@href="https://creatoracademy.youtube.com/page/lesson/cards"]')
+        while self.get_step() != 1:  # 두번째 단계
+            self.check_status(sleep=1)
 
         next_btn = wait_element_by_id(browser, 'next-button')
         next_btn.click()
@@ -84,27 +97,42 @@ class YoutubeUploader:
         unlisted_btn = wait_element_by_name(browser, 'UNLISTED')
         unlisted_btn.click()
 
+        while self.get_step() != 2:  # 세번째 단계
+            self.check_status(sleep=1)
+
         while 1:
+            done_btn = wait_element_by_id(self.browser, 'done-button', 1)
+            if not done_btn.is_enabled():
+                break
             try:
-                if is_element_exists_by(browser, 'ytcp-video-thumbnail-with-info', By.TAG_NAME):
-                    # print('humbnail-with-info exist')
+                done_btn.click()
+            except ElementClickInterceptedException:
+                break
+            self.check_status(sleep=1)
+
+        is_finish = False
+        while not is_finish:
+            for element in self.browser.find_elements_by_class_name('ytcp-button'):
+                if element.text == '닫기':
+                    is_finish = True
                     break
+            self.check_status(sleep=1)
 
-                if is_element_exists_by(browser, 'done-button', By.ID):
-                    # print('exist done-button')
-                    done_btn = browser.find_element_by_id('done-button')
-                    done_btn.click()
-                else:
-                    pass
-                    # print('not exist done-button')
-
-            except (ElementClickInterceptedException, NoSuchElementException, ElementNotInteractableException):
-                pass
-
-            browser.implicitly_wait(1)
-
-        # print('break')
         browser.implicitly_wait(2)
+        return True
+
+    def check_status(self, sleep=0.0):
+        for element in self.browser.find_elements_by_class_name('error-short'):
+            if element.text == '처리 중단됨':
+                raise BadStatusError('처리 중단됨')
+
+        if sleep:
+            self.browser.implicitly_wait(sleep)
+
+    def get_step(self):
+        for element in self.browser.find_elements_by_class_name('step'):
+            if element.get_attribute('state') == 'numbered':
+                return int(element.get_attribute('step-index'))  # 0 or 1 or 2
 
 
 if __name__ == '__main__':

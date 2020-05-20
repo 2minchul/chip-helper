@@ -10,23 +10,27 @@ def is_element_exists_by(br, element_name, by):
     return True
 
 
-def wait_element_by(br, element_name, by):
+def wait_element_by(br, element_name, by, interval=0.5, max_count=None):
+    n = 0
     while not is_element_exists_by(br, element_name, by):
-        br.implicitly_wait(0.5)
+        n += 1
+        br.implicitly_wait(interval)
+        if max_count and max_count <= n:
+            return None
     return br.find_element(by, element_name)
 
 
-def wait_element_by_id(br, element_id):
-    return wait_element_by(br, element_id, By.ID)
+def wait_element_by_id(br, element_id, interval=0.5, max_count=None):
+    return wait_element_by(br, element_id, By.ID, interval, max_count)
 
 
-def wait_element_by_name(br, name):
-    return wait_element_by(br, name, By.NAME)
+def wait_element_by_name(br, name, interval=0.5, max_count=None):
+    return wait_element_by(br, name, By.NAME, interval, max_count)
 
 
-def wait_element_by_tag(br, tag_name):
-    return wait_element_by(br, tag_name, By.TAG_NAME)
+def wait_element_by_tag(br, tag_name, interval=0.5, max_count=None):
+    return wait_element_by(br, tag_name, By.TAG_NAME, interval, max_count)
 
 
-def wait_element_by_xpath(br, xpath):
-    return wait_element_by(br, xpath, By.XPATH)
+def wait_element_by_xpath(br, xpath, interval=0.5, max_count=None):
+    return wait_element_by(br, xpath, By.XPATH, interval, max_count)

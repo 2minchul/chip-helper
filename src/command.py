@@ -18,7 +18,7 @@ from cmd_tool import (
 from imagetools import Size
 from qrcode import NaverQrCode, make_qr_image, make_redirect_html
 from thumbnail import composite_thumbnail, capture_video
-from youtube_uploader import YoutubeUploader
+from youtube_uploader import YoutubeUploader, YoutubeUploaderException
 
 sentry_sdk.init("https://1ff694f9169a4fa383a867fe10ed9329@o342398.ingest.sentry.io/5243685")
 
@@ -115,7 +115,7 @@ def upload_videos():
                     os.rename(os.path.join(cur_dir, filename), video_path)
                 video_dirs[video_name] = cur_dir
 
-            elif ext == '.jpg' and re.match(r'p\d+[.]jpg', filename):
+            elif ext == '.jpg' and re.match(r'^\d+[.]jpg$', filename):
                 thumbnail_path = os.path.join(cur_dir, filename)
 
         if not (video_path and thumbnail_path):
@@ -128,9 +128,16 @@ def upload_videos():
                 f.write(my_channel_id)
 
         print(f'uploading {video_name}')
-        uploader.upload_video(video_path, thumbnail_path)
+        try:
+            if uploader.upload_video(video_path, thumbnail_path):
+                print(f'success: {video_name}')
+            else:
+                print(f'failure: {video_name}')
+        except YoutubeUploaderException as e:
+            print(e)
+            print(f'failure: {video_name}')
 
-    print('모든 동영상이 업로드 되었습니다.')
+    print('모든 동영상이 업로드를 마쳤습니다.')
     exit_enter()
 
 
