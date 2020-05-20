@@ -89,6 +89,8 @@ def upload_videos():
     uploader = None
     video_dirs = {}
 
+    to_upload = {}
+
     for cur_dir, _, files in os.walk(input_path):
         dir_name = os.path.basename(cur_dir)
         video_path = video_name = thumbnail_path = None
@@ -122,6 +124,9 @@ def upload_videos():
         if not (video_path and thumbnail_path):
             continue
 
+        to_upload[int(dir_name)] = (video_name, video_path, thumbnail_path)
+
+    for dir_number, (video_name, video_path, thumbnail_path) in sorted(to_upload.items(), key=lambda e: e[0]):
         if not uploader:
             uploader = YoutubeUploader()
             try:
