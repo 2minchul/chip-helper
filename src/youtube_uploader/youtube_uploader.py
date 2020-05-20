@@ -62,13 +62,15 @@ class YoutubeUploader:
         upload_btn = None
         for _ in range(3):
             browser.get('https://studio.youtube.com/')
-
-            upload_btn = wait_element_by_id(browser, 'upload-button', max_count=3)
-            if not upload_btn:
-                upload_btn = wait_element_by_id(browser, 'upload-icon', max_count=3)
-            if upload_btn:
-                upload_btn.click()
-                break
+            try:
+                upload_btn = wait_element_by_id(browser, 'upload-button', max_count=3)
+                if not upload_btn:
+                    upload_btn = wait_element_by_id(browser, 'upload-icon', max_count=3)
+                if upload_btn:
+                    upload_btn.click()
+                    break
+            except:
+                browser.implicitly_wait(2)
         if not upload_btn:
             return False
 
