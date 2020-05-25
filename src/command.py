@@ -222,16 +222,22 @@ def qrcode():
 
     naver_qr: Optional[NaverQrCode] = None
 
-    for cur_dir, _, files in os.walk(input_path):
-        dir_name = os.path.basename(cur_dir)
-        if not dir_name.isnumeric():
-            continue
-        if 'youtube_url.txt' not in files:
-            continue
-        if 'qrcode.html' in files:
-            print(f'already created: {dir_name}')
-            continue
+    def walk_dir():
+        walk_dirs = {}
+        for cur_dir, dirs, files in os.walk(input_path):
+            dir_name = os.path.basename(cur_dir)
+            if not dir_name.isnumeric():
+                continue
+            if 'youtube_url.txt' not in files:
+                continue
+            if 'qrcode.html' in files:
+                print(f'already created: {dir_name}')
+                continue
+            walk_dirs[int(dir_name)] = (cur_dir, dirs, files)
+        return (v for k, v in sorted(walk_dirs.items(), key=itemgetter(0)))
 
+    for cur_dir, _, files in walk_dir():
+        dir_name = os.path.basename(cur_dir)
         idx = int(dir_name)
         idx_text = f'{idx:04}'
         with open(os.path.join(cur_dir, 'youtube_url.txt'), 'r') as f:
