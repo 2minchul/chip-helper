@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import sys
+from operator import itemgetter
 from typing import Optional
 
 import sentry_sdk
@@ -191,16 +192,21 @@ def update_youtube_urls(my_channel_id=None):
     ).get('url')
 
     is_created = False
+    video_urls = {}
     for video in yt.extract_info(my_channel_playlist, download=False, process=False).get('entries'):
         title = video['title']
-        if video_dirs.get(title):
+        if title.isnumeric() and video_dirs.get(title):
             is_created = True
+            video_urls[int(title)] = (title, f"https://www.youtube.com/watch?v={video['id']}")
+
+    if not is_created:
+        print('새로 업로드 된 동영상이 없거나, 아직 업로드가 완전히 완료되지 않았습니다.')
+        print('잠시 후 다시 시도해주세요.')
+    else:
+        for _, (title, url) in sorted(video_urls.items(), key=itemgetter(0)):
             print(f'make youtube_url.txt: {title}')
             with open(os.path.join(video_dirs[title], 'youtube_url.txt'), 'w') as f:
-                f.write(f"https://www.youtube.com/watch?v={video['id']}")
-    if not is_created:
-        print('업로드 된 동영상이 없거나, 아직 업로드가 완전히 완료되지 않았습니다.')
-        print('잠시 후 다시 시도해주세요.')
+                f.write(url)
     exit_enter()
 
 
