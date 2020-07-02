@@ -1,8 +1,7 @@
 # chip-helper
 
-- [Install](#Install)
-- [How to use](#how-to-use)
-
+> 칩의 핸드메이드 후드티 전사 이미지 생성 자동화 프로그램  
+> https://www.youtube.com/watch?v=_QiKlb_LB5w
 
 
 ## Install
