@@ -1,4 +1,4 @@
-Pillow==7.1.2
+Pillow==8.2.0
 PyQRCode==1.2.1
 pypng==0.0.20
 requests~=2.23.0
